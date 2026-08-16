@@ -380,7 +380,7 @@ function buildNeedCard(){
       <div class="row">
         <div class="${chipClass}">${isNote ? d/1000 + '000' : d}</div>
         <div class="label">${LABELS[d]}</div>
-        <input type="number" inputmode="numeric" min="0" step="1" id="need-${d}" value="0">
+        <input type="number" inputmode="numeric" min="0" step="1" id="need-${d}" placeholder="0">
         <div class="unit">枚</div>
       </div>`;
   }).join('');
@@ -496,7 +496,7 @@ function renderResult(final){
 }
 
 function resetAll(){
-  DENOMS.forEach(d => document.getElementById('need-'+d).value = 0);
+  DENOMS.forEach(d => document.getElementById('need-'+d).value = '');
   [1,2,3,4].forEach(i => document.getElementById('withdraw-'+i).value = '');
   document.getElementById('result').style.display = 'none';
   try{ localStorage.removeItem(STORE_KEY); }catch(e){}
