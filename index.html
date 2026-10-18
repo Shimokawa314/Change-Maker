@@ -137,7 +137,7 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 4px var(--accent-soft), 0 12px 26px rgba(70,55,20,0.09);
   }
-  .tile .top{ display:flex; align-items:center; gap: 9px; flex-shrink:0; min-width: 108px; }
+  .tile .top{ display:flex; align-items:center; gap: 9px; flex-shrink:0; min-width: 116px; }
   .tile .name{ font-size: 13px; color: var(--muted); font-weight: 700; }
   .tile .field{ flex:1; min-width:0; display:flex; align-items:baseline; gap: 6px; }
   .val{
@@ -179,24 +179,24 @@
     margin: 0 7px 0 7px;
   }
 
-  /* ---------- chips ---------- */
-  .chipbox{ width: 36px; height: 32px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .chip{
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Manrope', sans-serif;
-    font-weight: 800;
-    line-height:1;
+  /* ---------- お金アイコン(PNG) ---------- */
+  .chipbox{ width: 60px; height: 38px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .money{
+    display:block;
+    height:auto;
+    pointer-events:none;
+    -webkit-user-drag:none;
+    -webkit-touch-callout:none;
   }
-  .chip.note{ width: 36px; height: 22px; border-radius: 5px; font-size: 9.5px; }
-  .chip.note.n5000{ background: linear-gradient(135deg,#DDD1F7,#B8A5E8); color:#38287A; border:1px solid rgba(80,60,150,.28); }
-  .chip.note.n1000{ background: linear-gradient(135deg,#D3E8FA,#9DC9EF); color:#1B4A78; border:1px solid rgba(30,90,150,.28); }
-  .chip.coin{ border-radius: 50%; font-size: 9px; color:#3A3A3A; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.55), 0 2px 5px rgba(60,50,20,.22); }
-  .chip.coin.c500{ width:32px; height:32px; background: radial-gradient(circle at 30% 28%, #FBF1C8, #D9BE6E); }
-  .chip.coin.c100{ width:27px; height:27px; background: radial-gradient(circle at 30% 28%, #FAFBFC, #B9BDC4); }
-  .chip.coin.c50{  width:25px; height:25px; background: radial-gradient(circle at 30% 28%, #FAFBFC, #B9BDC4); }
-  .chip.coin.c10{  width:28px; height:28px; background: radial-gradient(circle at 30% 28%, #F6C9A5, #C0733F); color:#4A2410; }
-  .chip.coin.c5{   width:26px; height:26px; background: radial-gradient(circle at 30% 28%, #F9E598, #D3A93A); color:#4A3608; }
-  .chip.coin.c1{   width:23px; height:23px; background: radial-gradient(circle at 30% 28%, #F7F8F9, #C9CCD2); }
+  .money.note{ width: 58px; filter: drop-shadow(0 2px 3px rgba(60,50,20,0.28)); }
+  .money.coin{ filter: drop-shadow(0 2px 3px rgba(60,50,20,0.30)); }
+  /* コインの大きさは実物の直径比(500円=36pxを基準) */
+  .money.c500{ width: 36px; }
+  .money.c100{ width: 31px; }
+  .money.c50{  width: 29px; }
+  .money.c10{  width: 32px; }
+  .money.c5{   width: 30px; }
+  .money.c1{   width: 27px; }
 
   /* ---------- numpad ---------- */
   .numpad{
@@ -478,11 +478,13 @@ let active = 0;
 let lastCtx = null;
 
 /* ---------- 部品 ---------- */
+const NOTE_SIZE = {5000:[240,109], 1000:[240,115]};
 function chipHTML(d){
   if(NOTES.includes(d)){
-    return `<div class="chipbox"><div class="chip note n${d}">${d/1000}000</div></div>`;
+    const [w,h] = NOTE_SIZE[d];
+    return `<div class="chipbox"><img class="money note" src="note-${d}.png" width="${w}" height="${h}" alt="" draggable="false"></div>`;
   }
-  return `<div class="chipbox"><div class="chip coin c${d}">${d}</div></div>`;
+  return `<div class="chipbox"><img class="money coin c${d}" src="coin-${d}.png" width="144" height="144" alt="" draggable="false"></div>`;
 }
 
 function buildTiles(){
