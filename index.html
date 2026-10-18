@@ -124,7 +124,7 @@
     border: 1.5px solid var(--line);
     border-radius: 18px;
     padding: 10px 14px;
-    min-height: 58px;
+    min-height: 52px;
     display:flex;
     align-items:center;
     gap: 12px;
@@ -137,7 +137,7 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 4px var(--accent-soft), 0 12px 26px rgba(70,55,20,0.09);
   }
-  .tile .top{ display:flex; align-items:center; gap: 9px; flex-shrink:0; min-width: 116px; }
+  .tile .top{ display:flex; align-items:center; gap: 9px; flex-shrink:0; min-width: 100px; }
   .tile .name{ font-size: 13px; color: var(--muted); font-weight: 700; }
   .tile .field{ flex:1; min-width:0; display:flex; align-items:baseline; gap: 6px; }
   .val{
@@ -176,11 +176,11 @@
     font-size: 11px;
     display:flex; align-items:center; justify-content:center;
     flex-shrink:0;
-    margin: 0 7px 0 7px;
+    margin: 0 12px 0 12px;
   }
 
   /* ---------- お金アイコン(PNG) ---------- */
-  .chipbox{ width: 60px; height: 38px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .chipbox{ width: 46px; height: 30px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .money{
     display:block;
     height:auto;
@@ -188,15 +188,15 @@
     -webkit-user-drag:none;
     -webkit-touch-callout:none;
   }
-  .money.note{ width: 58px; filter: drop-shadow(0 2px 3px rgba(60,50,20,0.28)); }
-  .money.coin{ filter: drop-shadow(0 2px 3px rgba(60,50,20,0.30)); }
-  /* コインの大きさは実物の直径比(500円=36pxを基準) */
-  .money.c500{ width: 36px; }
-  .money.c100{ width: 31px; }
-  .money.c50{  width: 29px; }
-  .money.c10{  width: 32px; }
-  .money.c5{   width: 30px; }
-  .money.c1{   width: 27px; }
+  .money.note{ width: 44px; filter: drop-shadow(0 1px 2px rgba(60,50,20,0.28)); }
+  .money.coin{ filter: drop-shadow(0 1px 2px rgba(60,50,20,0.30)); }
+  /* コインの大きさは実物の直径比(500円=25.2pxを基準) */
+  .money.c500{ width: 25.2px; }
+  .money.c100{ width: 21.6px; }
+  .money.c50{  width: 19.8px; }
+  .money.c10{  width: 22.5px; }
+  .money.c5{   width: 20.7px; }
+  .money.c1{   width: 18.9px; }
 
   /* ---------- numpad ---------- */
   .numpad{
@@ -277,7 +277,7 @@
     transition: transform .08s ease;
   }
   .btn:active{ transform: scale(.98); }
-  .btn.ghost{ width: 112px; background:#fff; color: var(--ink); box-shadow: 0 0 0 1px var(--line) inset; }
+  .btn.ghost{ flex:1; background:#fff; color: var(--ink); box-shadow: 0 0 0 1px var(--line) inset; }
   .btn.main{ flex:1; background: var(--accent); color:#06281F; box-shadow: 0 8px 18px rgba(25,211,162,0.32); }
 
   /* ---------- receipt ---------- */
@@ -360,25 +360,6 @@
   }
   .rc-end{ text-align:center; font-size: 10px; color: var(--muted); letter-spacing:.3em; }
 
-  /* ---------- toast ---------- */
-  .toast{
-    position: fixed;
-    left:50%; bottom: calc(env(safe-area-inset-bottom) + 92px);
-    transform: translate(-50%, 10px);
-    background: var(--ink);
-    color:#fff;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 10px 18px;
-    border-radius: 999px;
-    opacity: 0;
-    pointer-events:none;
-    transition: opacity .2s ease, transform .2s ease;
-    z-index: 40;
-    white-space: nowrap;
-  }
-  .toast.show{ opacity:1; transform: translate(-50%, 0); }
-
   footer{ text-align:center; margin-top: 8px; font-size:10.5px; color: var(--faint); letter-spacing:.24em; font-family:'Manrope',sans-serif; font-weight:700; }
 
   @media (max-width: 360px){
@@ -457,16 +438,13 @@
 <div class="actionbar" id="resultBar">
   <div class="inner">
     <button class="btn ghost" id="editBtn" type="button">修正する</button>
-    <button class="btn main" id="copyBtn" type="button">結果をコピー</button>
   </div>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 const DENOMS = [5000,1000,500,100,50,10,5,1];
 const NOTES = [5000,1000];
-const LABELS = {5000:'5千円',1000:'千円',500:'500円',100:'100円',50:'50円',10:'10円',5:'5円',1:'1円'};
+const LABELS = {5000:'5000円',1000:'1000円',500:'500円',100:'100円',50:'50円',10:'10円',5:'5円',1:'1円'};
 const STORE_KEY = 'denomi_v1';
 
 // 入力欄の並び順(テンキーの「次へ」はこの順に進む)
@@ -719,39 +697,6 @@ function showInput(){
   closePad();
 }
 
-/* ---------- コピー ---------- */
-function buildCopyText(c){
-  const lines = [`【両替依頼】${c.stamp}`];
-  DENOMS.forEach(d => { if(c.final[d] > 0) lines.push(`${LABELS[d]} × ${c.final[d]}枚`); });
-  lines.push(`合計 ${yen(c.exchange)}`);
-  return lines.join('\n');
-}
-function toast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.classList.remove('show'), 1800);
-}
-async function copyResult(){
-  if(!lastCtx) return;
-  const text = buildCopyText(lastCtx);
-  try{
-    await navigator.clipboard.writeText(text);
-    toast('コピーしました');
-  }catch(e){
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    let ok = false;
-    try{ ok = document.execCommand('copy'); }catch(_){}
-    document.body.removeChild(ta);
-    toast(ok ? 'コピーしました' : 'コピーできませんでした');
-  }
-}
-
 /* ---------- クリア(2回タップで確定) ---------- */
 function clearAll(){
   FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
@@ -814,7 +759,6 @@ document.addEventListener('click', e => {
 document.getElementById('calcBtn').addEventListener('click', calculate);
 document.getElementById('clearBtn').addEventListener('click', onClearTap);
 document.getElementById('editBtn').addEventListener('click', showInput);
-document.getElementById('copyBtn').addEventListener('click', copyResult);
 window.addEventListener('resize', measurePad);
 
 // PCなど物理キーボードでも入力可
